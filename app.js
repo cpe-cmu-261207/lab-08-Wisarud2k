@@ -46,11 +46,48 @@ app.delete("/courses/:id",(req,res) => {
   // console.log(id);
   const file = fs.readFileSync('myCourses.json','utf8')
   const data = JSON.parse(file)
-  
 
   data.courses = data.courses.filter(date => date.courseId !== Number(id))
-  res.json(data.courses)
 
+  let sum = 0;
+  let i = 0;
+  data.courses.map(date => {
+    sum += (date.gpa*date.credit);
+    i += date.credit;
+    //console.log(date.gpa)
+  })
+  // console.log(sum/i)
+  data.gpax = (sum/i);
+  fs.writeFileSync('myCourses.json',JSON.stringify(data))
+  res.json(data)
+
+})
+
+app.post("/addCourse",(req,res) => {
+  const course = req.body
+  const file = fs.readFileSync('myCourses.json','utf8')
+  const data = JSON.parse(file)
+
+  if(course.courseId === null || course.courseName === null ||
+    course.credit === null || course.gpa === null){
+      res.status(422);
+      res.json({message: 'data not complete'})
+    }
+
+  data.courses.push({
+    ...course,
+  })
+
+  let sum = 0;
+  let i = 0;
+  data.courses.map(date => {
+    sum += (date.gpa*date.credit);
+    i += date.credit;
+    //console.log(date.gpa)
+  })
+  data.gpax = (sum/i);
+  fs.writeFileSync('myCourses.json',JSON.stringify(data))
+  res.json(course)
 })
 
 
